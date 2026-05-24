@@ -8,7 +8,10 @@ RUN npm run build
 
 FROM nginx:alpine
 COPY --from=frontend-builder /frontend/dist /usr/share/nginx/html
-COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+# Copy as template — entrypoint.sh processes ${PORT} at runtime
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf.template
+COPY nginx/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/entrypoint.sh"]
